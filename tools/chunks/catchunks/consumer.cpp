@@ -30,11 +30,12 @@
 namespace ndn {
 namespace chunks {
 
-Consumer::Consumer(security::v2::Validator& validator, std::ostream& os)
+Consumer::Consumer(security::v2::Validator& validator,std::string& fn, std::ofstream& os)
   : m_validator(validator)
   , m_outputStream(os)
   , m_nextToPrint(0)
-{
+  , fileName(fn)
+{ 
 }
 
 void
@@ -83,7 +84,12 @@ Consumer::writeInOrderData()
        it != m_bufferedData.end() && it->first == m_nextToPrint;
        it = m_bufferedData.erase(it), ++m_nextToPrint) {
     const Block& content = it->second->getContent();
+if(!m_outputStream.is_open())
+                m_outputStream.open (fileName, std::ios::out | std::ios::app );
     m_outputStream.write(reinterpret_cast<const char*>(content.value()), content.value_size());
+    m_outputStream.close();
+
+//    m_outputStream.write(reinterpret_cast<const char*>(content.value()), content.value_size());
   }
 }
 

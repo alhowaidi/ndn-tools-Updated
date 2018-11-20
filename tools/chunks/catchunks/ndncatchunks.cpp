@@ -39,7 +39,10 @@
 #include "options.hpp"
 #include "core/version.hpp"
 
+#include <iostream>
 #include <fstream>
+
+//#include <fstream>
 #include <ndn-cxx/security/validator-null.hpp>
 
 namespace ndn {
@@ -56,6 +59,7 @@ main(int argc, char** argv)
   int maxRetriesAfterVersionFound(0);
   int64_t discoveryTimeoutMs(300);
   std::string uri;
+  std::string fileName;
 
   // congestion control parameters, CWA refers to conservative window adaptation,
   // i.e. only reduce window size at most once per RTT
@@ -81,6 +85,7 @@ main(int argc, char** argv)
     ("quiet,q",     po::bool_switch(&options.isQuiet), "suppress all diagnostic output, except fatal errors")
     ("verbose,v",   po::bool_switch(&options.isVerbose), "turn on verbose output (per segment information")
     ("version,V",   "print program version and exit")
+    ("FileName,o",   po::value<std::string>()->default_value(fileName), "file to be written")	
     ;
 
   po::options_description iterDiscoveryDesc("Iterative version discovery options");
@@ -152,6 +157,9 @@ main(int argc, char** argv)
     po::store(po::command_line_parser(argc, argv).options(optDesc).positional(p).run(), vm);
     po::notify(vm);
   }
+
+//std::string file = vm["FileName"].as<std::string>();
+
   catch (const po::error& e) {
     std::cerr << "ERROR: " << e.what() << std::endl;
     return 2;
@@ -160,6 +168,8 @@ main(int argc, char** argv)
     std::cerr << "ERROR: " << e.what() << std::endl;
     return 2;
   }
+
+std::string file = vm["FileName"].as<std::string>();
 
   if (vm.count("help") > 0) {
     std::cout << "Usage: " << programName << " [options] ndn:/name" << std::endl;
@@ -215,6 +225,8 @@ main(int argc, char** argv)
     std::cerr << "ERROR: cannot be quiet and verbose at the same time" << std::endl;
     return 2;
   }
+
+//std::string fileName = options.fileName;
 
   try {
     Face face;
@@ -292,11 +304,11 @@ main(int argc, char** argv)
       std::cerr << "ERROR: Interest pipeline type not valid" << std::endl;
       return 2;
     }
-
-    Consumer consumer(security::v2::getAcceptAllValidator());
+std::ofstream m_outputStream;
+    Consumer consumer(security::v2::getAcceptAllValidator(), file, m_outputStream);
     BOOST_ASSERT(discover != nullptr);
     BOOST_ASSERT(pipeline != nullptr);
-    consumer.run(std::move(discover), std::move(pipeline));
+    consumer.run(std::move(discover),std::move(pipeline));
     face.processEvents();
   }
   catch (const Consumer::ApplicationNackError& e) {

@@ -34,6 +34,10 @@
 #include <ndn-cxx/security/v2/validation-error.hpp>
 #include <ndn-cxx/security/v2/validator.hpp>
 
+
+#include <iostream>
+#include <fstream>
+
 namespace ndn {
 namespace chunks {
 
@@ -71,8 +75,8 @@ public:
    * @brief Create the consumer
    */
   explicit
-  Consumer(security::v2::Validator& validator, std::ostream& os = std::cout);
-
+//  Consumer(security::v2::Validator& validator, std::ostream& os = std::cout);
+Consumer(security::v2::Validator& validator,std::string& fileName, std::ofstream& os);
   /**
    * @brief Run the consumer
    */
@@ -89,10 +93,11 @@ PUBLIC_WITH_TESTS_ELSE_PRIVATE:
 
 private:
   security::v2::Validator& m_validator;
-  std::ostream& m_outputStream;
+  std::ofstream& m_outputStream;
   unique_ptr<DiscoverVersion> m_discover;
   unique_ptr<PipelineInterests> m_pipeline;
   uint64_t m_nextToPrint;
+std::string fileName;
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE:
   std::map<uint64_t, shared_ptr<const Data>> m_bufferedData;

@@ -40,6 +40,7 @@ struct Options
   bool mustBeFresh = false;
   bool isQuiet = false;
   bool isVerbose = false;
+  std::string fileName;
 };
 
 } // namespace chunks
